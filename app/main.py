@@ -26,14 +26,60 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-openai.api_key = Config.OPEN_API_KEY
+OPEN_API_KEY = Config.OPEN_API_KEY
 SERVICE_ACCOUNT_KEY_FILE = Config.SERVICE_ACCOUNT_KEY_FILE
+GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY
 
 cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_FILE)
 app_test = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 nlp = spacy.load("en_core_web_sm")
+messages = [
+    {
+        "role": "system",
+        "content": "You're a great Problem Report tool to summary the information error like software, hardware or field inside of reports ",
+    },
+    {
+        "role": "user",
+        "content": "I need that you response must be clear an concise for the next information no more to two sentences, and don't add formalizims only summary of the report issue.",
+    },
+    {
+        "role": "assistant",
+        "content": "Understood! Please provide me with the information from the report, and I'll summarize the issue for you in two concise sentences.",
+    },
+    {
+        "role": "user",
+        "content": "If your input seems like: I'm experiencing a hardware issue with my Kiwibot at location New York. The issue is related to the wheels not moving properly. I noticed this problem when the bot was attempting to navigate uneven surfaces. The wheels seem to get stuck frequently. Response some like the next: The Kiwibot at our NY location is experiencing a hardware problem with the wheels, causing frequent sticking and hindering its mobility, especially on uneven surfaces.",
+    },
+]
+
+
+class ChatGPT:
+    _instance = None
+    openai.api_key = Config.OPEN_API_KEY
+
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            cls._instance = ChatGPT()
+        return cls._instance
+
+    def __init__(self):
+        self.context = messages
+
+    def generate_response(self, message):
+        self.context.append({"role": "user", "content": message})
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo", messages=self.context
+        )
+        self.context.append(
+            {
+                "role": "assistant",
+                "content": response["choices"][0]["message"]["content"],
+            }
+        )
+        return response["choices"][0]["message"]["content"]
 
 
 class BotStatus(str, Enum):
@@ -101,21 +147,11 @@ async def problem_report_endpoint(report: ProblemReport):
                 detail="Invalid location range Latitude between [-90,90] Longitude [-180,180], check your values",
             )
 
-        messages = [
-            {
-                "role": "system",
-                "content": "Kiwibot Issue Reporting System. Please provide the details of the problem, including the location, type of issue (software, hardware, or field), and any relevant information.",
-            }
-        ]
         content = report.content
 
-        messages.append({"role": "user", "content": content})
-        ## GTP-4 model wait list, waiting approval
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=messages
-        )
-        print(response)
-        response_content = response["choices"][0]["message"]["content"]
+        assistant = ChatGPT.get_instance()
+
+        response_content = assistant.generate_response(content)
 
         ticket = Ticket(
             ticket_id=ticket_id,
@@ -143,9 +179,20 @@ def get_problem_location(lat, lon):
 
     try:
         location = geolocator.reverse((lat, lon))
-        return location.address
-    except:
-        return None
+        if location:
+            return location.address
+    except Exception as e:
+        print(f"Error retrieving location with Nominatim: {e}")
+
+    gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+    try:
+        results = gmaps.reverse_geocode((lat, lon))
+        if results:
+            return results[0]["formatted_address"]
+    except Exception as e:
+        print(f"Error retrieving location with Google Maps API: {e}")
+
+    return f"Flat coordinates: ({lat}, {lon})"
 
 
 def get_problem_type(text):
@@ -153,6 +200,21 @@ def get_problem_type(text):
     for token in doc:
         if token.text.lower() in ["software", "hardware", "field"]:
             return ProblemType(token.text.lower())
+    return None
+
+
+def get_location_info(location_text):
+    doc = nlp(location_text)
+
+    location_entities = []
+
+    for ent in doc.ents:
+        if ent.label_ in ["GPE", "LOC"]:
+            location_entities.append(ent.text)
+
+    if location_entities:
+        return ", ".join(location_entities)
+
     return None
 
 

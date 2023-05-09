@@ -6,3 +6,6 @@ pydantic
 spacy
 geopy
 firebase-admin
+urllib3==1.26.15
+cachecontrol
+googlemaps
