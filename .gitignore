@@ -1,3 +1,4 @@
 .env
 .vscode
 /gpt-test
+/app/keys.json

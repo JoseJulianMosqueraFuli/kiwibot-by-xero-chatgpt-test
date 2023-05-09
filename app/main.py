@@ -8,12 +8,19 @@ from pydantic import BaseModel, confloat
 from enum import Enum
 from datetime import datetime
 from geopy.geocoders import Nominatim
-
+import firebase_admin
+from firebase_admin import credentials, firestore
 
 app = FastAPI()
 config = Config()
 
 openai.api_key = Config.OPEN_API_KEY
+SERVICE_ACCOUNT_KEY_FILE = Config.SERVICE_ACCOUNT_KEY_FILE
+
+cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_FILE)
+app_test = firebase_admin.initialize_app(cred)
+db = firestore.client()
+
 nlp = spacy.load("en_core_web_sm")
 
 
@@ -60,6 +67,7 @@ class Ticket(BaseModel):
 
 
 tickets = []
+tickets_collection = db.collection("tickets")
 
 
 @app.post("/problem-report")
@@ -104,6 +112,8 @@ async def problem_report_endpoint(report: ProblemReport):
         )
 
         tickets.append(ticket)
+        ticket_dict = ticket.dict()
+        tickets_collection.document(ticket_id).set(ticket_dict)
 
         return ticket.dict()
     except Exception as e:
