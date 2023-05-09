@@ -37,6 +37,9 @@ cd kiwibot-by-xero-chatgpt-test
 
 ```python
 OPEN_API_KEY = <your_openai_api_key>
+FIREBASE_API_KEY = <your_firebase_api_key>
+SERVICE_ACCOUNT_KEY_FILE = <your_service_account_key_file>
+GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
 ```
 
 4. Build and run the Docker container:
@@ -61,10 +64,10 @@ Input
 
 ```jsx
 {
-  "content": "I'm experiencing a hardware issue with my Kiwibot at location NY. The issue is related to the wheels not moving properly. I noticed this problem when the bot was attempting to navigate uneven surfaces. The wheels seem to get stuck frequently. Please generate a formatted ticket with all the necessary details for the support team to address this issue.",
+  "content": "I'm experiencing a hardware issue with my Kiwibot at location NY. The issue is related to the wheels not moving properly. I noticed this problem when the bot was attempting to navigate uneven surfaces. The wheels seem to get stuck frequently.",
   "heartbeat": {
-    "bot_id": "abc123",
-    "timestamp": "2023-05-08T10:00:00Z",
+    "bot_id": "abc12435",
+    "timestamp" : "2023-05-09T12:00:00Z",
     "location": {
       "lat": 40.731,
       "lon": -73.997
@@ -81,11 +84,74 @@ Response Ticket
 
 ```jsx
 {
-    "ticket_id": "e79cba84-511c-45a0-a6ea-ec3997cac854",
+    "ticket_id": "95b13970-2819-4684-8ef5-2b8aef8c825c",
     "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
     "problem_type": "hardware",
-    "summary": "Issue Report Ticket:\n\nLocation: NY\n\nType of Issue: Hardware\n\nDescription: The wheels of the kiwibot are not moving properly. The bot seems to get stuck frequently while navigating uneven surfaces. \n\nSteps Taken: I have tried restarting the bot, but the issue persists. \n\nAdditional Information: The kiwibot was working fine before this issue occurred. No recent updates have been made to the software. \n\nPlease address this issue as soon as possible.",
+    "summary": "The hardware issue with the Kiwibot at the NY location is related to the wheels repeatedly getting stuck when attempting to navigate uneven surfaces.",
+    "bot_id": "abc12435",
+    "status": "open",
+    "status_changes": []
+}
+```
+
+### Ticket
+
+#### GET /ticket/{ticket_id}
+
+```jsx
+http://localhost:8000/ticket/95b13970-2819-4684-8ef5-2b8aef8c825c
+```
+
+response
+
+```jsx
+{
+    "ticket_id": "95b13970-2819-4684-8ef5-2b8aef8c825c",
+    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
+    "problem_type": "hardware",
+    "summary": "The hardware issue with the Kiwibot at the NY location is related to the wheels repeatedly getting stuck when attempting to navigate uneven surfaces.",
+    "bot_id": "abc12435",
+    "status": "open",
+    "status_changes": []
+}
+```
+
+#### PATCH /ticket/{ticket_id}/status
+
+```jsx
+http://localhost:8000/ticket/{ticket_id}/status
+```
+
+Input
+
+```jsx
+{
+  "new_status": "closed",
+  "reason": "Ticket is finish reviewed"
+}
+```
+
+Output
+
+```jsx
+{
+    "ticket_id": "2575574d-26dd-485c-8a70-80ca42b52f56",
+    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
+    "problem_type": "hardware",
+    "summary": "Issue Reporting Ticket\n\nLocation: NY\n\nType of Issue: Hardware\n\nDescription of Issue: The wheels of the Kiwibot are not moving properly and are getting stuck when navigating uneven surfaces.\n\nSteps Taken to Reproduce Issue: Navigating the Kiwibot on uneven surfaces.\n\nRelevant Information: The Kiwibot is also having trouble navigating around obstacles and may require additional testing.\n\nPriority Level: High\n\nDate Submitted: [Current Date] \n\nThank you for your attention to this matter. Please let me know if any additional information is needed.",
     "bot_id": "abc123",
-    "status": "open"
+    "status": "closed",
+    "status_changes": [
+        {
+            "timestamp": "2023-05-09T14:34:45.133064+00:00",
+            "status": "in progress",
+            "reason": "Ticket is being worked on"
+        },
+        {
+            "timestamp": "2023-05-09T20:18:02.314041",
+            "status": "closed",
+            "reason": "Ticket is finish reviewed"
+        }
+    ]
 }
 ```
