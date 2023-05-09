@@ -209,26 +209,14 @@ def get_problem_location(lat, lon):
 
 
 def get_problem_type(text):
-    doc = nlp(text)
-    for token in doc:
-        if token.text.lower() in ["software", "hardware", "field", "undefined"]:
-            return ProblemType(token.text.lower())
-    return None
-
-
-def get_location_info(location_text):
-    doc = nlp(location_text)
-
-    location_entities = []
-
-    for ent in doc.ents:
-        if ent.label_ in ["GPE", "LOC"]:
-            location_entities.append(ent.text)
-
-    if location_entities:
-        return ", ".join(location_entities)
-
-    return None
+    try:
+        doc = nlp(text)
+        for token in doc:
+            if token.text.lower() in ["software", "hardware", "field", "undefined"]:
+                return ProblemType(token.text.lower())
+    except Exception as e:
+        print("An error occurred:", str(e))
+    return "undefined"
 
 
 @app.get("/ticket/{ticket_id}")
