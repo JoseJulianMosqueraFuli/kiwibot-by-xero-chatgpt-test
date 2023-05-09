@@ -64,7 +64,7 @@ Input
 
 ```jsx
 {
-  "content": "I'm experiencing a hardware issue with my Kiwibot at location NY. The issue is related to the wheels not moving properly. I noticed this problem when the bot was attempting to navigate uneven surfaces. The wheels seem to get stuck frequently.",
+  "content": "My Kiwibot is moving slow and the device is hot. The hardware version is a bit old",
   "heartbeat": {
     "bot_id": "abc12435",
     "timestamp" : "2023-05-09T12:00:00Z",
@@ -84,10 +84,10 @@ Response Ticket
 
 ```jsx
 {
-    "ticket_id": "95b13970-2819-4684-8ef5-2b8aef8c825c",
+    "ticket_id": "77af15af-4536-435d-bd2d-323c3707e2cf",
     "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
     "problem_type": "hardware",
-    "summary": "The hardware issue with the Kiwibot at the NY location is related to the wheels repeatedly getting stuck when attempting to navigate uneven surfaces.",
+    "summary": "The Kiwibot is facing a hardware problem that is causing the reduced speed and overheating. Given that the hardware version is old, it might be necessary to replace certain components or upgrade the Kiwibot to resolve the problem. Further investigation is recommended to identify the root cause of the issue.",
     "bot_id": "abc12435",
     "status": "open",
     "status_changes": []
