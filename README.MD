@@ -1,10 +1,6 @@
 # Kiwibot-by-Xero-OpenAi-ChatGPT
 
-This is a sample API built using Python and FastAPI, consuming OpenAI. It feature endpoint to chat with ChatGPT.
-
-## Disclaimer
-
-**Important:** Please note that the information provided by the Kiwibot-by-Xero-OpenAi-ChatGPT project is subject to certain limitations. Due to the lack of access to the requirements provided by Kiwibot and the information of the AI model itself.
+This is a sample API built using Python and FastAPI, consuming OpenAI. It features an endpoint to chat with ChatGPT to support report problem for kiwi.
 
 ## Overview:
 
@@ -40,7 +36,7 @@ cd kiwibot-by-xero-chatgpt-test
 3. Create a `.env` file like `.env.example` :
 
 ```python
-OPEN_API_KEY =
+OPEN_API_KEY = <your_openai_api_key>
 ```
 
 4. Build and run the Docker container:
@@ -53,16 +49,43 @@ docker-compose up --build
 
 ## Available endpoints
 
-### OpenAI
+### Problem Report Endpoint
 
-#### POST
+#### POST /problem-report
 
 ```jsx
-http://127.0.0.1:8000/openai
+http://localhost:8000/problem-report
 ```
+
+Input
 
 ```jsx
 {
-  "content": "how you can describe kiwibot company?"
+  "content": "I'm experiencing a hardware issue with my Kiwibot at location NY. The issue is related to the wheels not moving properly. I noticed this problem when the bot was attempting to navigate uneven surfaces. The wheels seem to get stuck frequently. Please generate a formatted ticket with all the necessary details for the support team to address this issue.",
+  "heartbeat": {
+    "bot_id": "abc123",
+    "timestamp": "2023-05-08T10:00:00Z",
+    "location": {
+      "lat": 40.731,
+      "lon": -73.997
+    },
+    "status": "available",
+    "battery_level": 80.08,
+    "software_version": "v1.0",
+    "hardware_version": "v2.0"
+  }
+}
+```
+
+Response Ticket
+
+```jsx
+{
+    "ticket_id": "e79cba84-511c-45a0-a6ea-ec3997cac854",
+    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
+    "problem_type": "hardware",
+    "summary": "Issue Report Ticket:\n\nLocation: NY\n\nType of Issue: Hardware\n\nDescription: The wheels of the kiwibot are not moving properly. The bot seems to get stuck frequently while navigating uneven surfaces. \n\nSteps Taken: I have tried restarting the bot, but the issue persists. \n\nAdditional Information: The kiwibot was working fine before this issue occurred. No recent updates have been made to the software. \n\nPlease address this issue as soon as possible.",
+    "bot_id": "abc123",
+    "status": "open"
 }
 ```
