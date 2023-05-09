@@ -2,7 +2,7 @@ import openai
 import spacy
 from spacy.matcher import Matcher
 import uuid
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from app.config import Config
 from pydantic import BaseModel, confloat
 from enum import Enum
@@ -10,6 +10,7 @@ from datetime import datetime
 from geopy.geocoders import Nominatim
 import firebase_admin
 from firebase_admin import credentials, firestore
+from typing import List, Optional
 
 app = FastAPI()
 config = Config()
@@ -57,6 +58,12 @@ class TicketStatus(str, Enum):
     closed = "closed"
 
 
+class TicketStatusChange(BaseModel):
+    timestamp: datetime
+    status: TicketStatus
+    reason: str
+
+
 class Ticket(BaseModel):
     ticket_id: str
     problem_location: str
@@ -64,9 +71,9 @@ class Ticket(BaseModel):
     summary: str
     bot_id: str
     status: TicketStatus
+    status_changes: Optional[List[TicketStatusChange]] = []
 
 
-tickets = []
 tickets_collection = db.collection("tickets")
 
 
@@ -111,7 +118,6 @@ async def problem_report_endpoint(report: ProblemReport):
             status=TicketStatus.open,
         )
 
-        tickets.append(ticket)
         ticket_dict = ticket.dict()
         tickets_collection.document(ticket_id).set(ticket_dict)
 
@@ -148,6 +154,45 @@ async def get_ticket(ticket_id: str):
         if ticket_doc.exists:
             ticket_data = ticket_doc.to_dict()
             return ticket_data
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="Ticket not found",
+            )
+    except Exception as e:
+        print(str(e))
+        raise
+
+
+@app.patch("/ticket/{ticket_id}/status")
+async def change_ticket_status(ticket_id: str, request: Request):
+    try:
+        request_data = await request.json()
+        new_status = request_data.get("new_status")
+        reason = request_data.get("reason")
+
+        if not new_status or not reason:
+            raise HTTPException(
+                status_code=400,
+                detail="Missing 'new_status' or 'reason' in request body.",
+            )
+
+        doc_ref = tickets_collection.document(ticket_id)
+        ticket_doc = doc_ref.get()
+
+        if ticket_doc.exists:
+            ticket_data = ticket_doc.to_dict()
+            ticket = Ticket(**ticket_data)
+
+            change = TicketStatusChange(
+                timestamp=datetime.now(), status=new_status, reason=reason
+            )
+            ticket.status_changes.append(change)
+            ticket.status = new_status
+
+            doc_ref.set(ticket.dict())
+
+            return ticket.dict()
         else:
             raise HTTPException(
                 status_code=404,
