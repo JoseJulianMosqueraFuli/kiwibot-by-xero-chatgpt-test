@@ -137,3 +137,22 @@ def get_problem_type(text):
         if token.text.lower() in ["software", "hardware", "field"]:
             return ProblemType(token.text.lower())
     return None
+
+
+@app.get("/ticket/{ticket_id}")
+async def get_ticket(ticket_id: str):
+    try:
+        doc_ref = tickets_collection.document(ticket_id)
+        ticket_doc = doc_ref.get()
+
+        if ticket_doc.exists:
+            ticket_data = ticket_doc.to_dict()
+            return ticket_data
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="Ticket not found",
+            )
+    except Exception as e:
+        print(str(e))
+        raise
