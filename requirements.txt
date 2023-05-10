@@ -9,3 +9,9 @@ firebase-admin
 urllib3==1.26.15
 cachecontrol
 googlemaps
+jinja2
+pytest
+pytest-mock
+httpx
+pytest-asyncio
+requests  
