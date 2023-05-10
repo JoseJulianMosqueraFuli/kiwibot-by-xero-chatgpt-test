@@ -5,9 +5,9 @@ from datetime import datetime
 from .firebase import tickets_collection
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
 from app.models import (
     ProblemReport,
-    ProblemType,
     TicketStatus,
     TicketStatusChange,
     Ticket,
@@ -20,6 +20,7 @@ app = FastAPI()
 app.title = "Kiwibot by Xero ChatGPT"
 app.version = "v1.0"
 config = Config()
+templates = Jinja2Templates(directory="app/templates")
 
 origins = ["*"]
 
@@ -30,6 +31,11 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.post(
