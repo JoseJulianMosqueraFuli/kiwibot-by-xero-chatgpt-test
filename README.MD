@@ -1,3 +1,9 @@
+# NOTE :
+
+The first deadline set is May 10th at 8 AM GT (-5).
+This is the version achieved up to this point, using GPT-3.5. I have the option to use GPT-4 since I've been on the waitlist since last week.
+For the first deadline, I left the "master" branch and will continue with the "develop" branch. The second deadline is May 10th at 11 PM GT (-5).
+
 # Kiwibot-by-Xero-OpenAi-ChatGPT
 
 This is a sample API built using Python and FastAPI, consuming OpenAI. It features an endpoint to chat with ChatGPT to support report problem for kiwi.
@@ -15,7 +21,9 @@ This is the API built up to the deadline of the case study, in branch master.
 
 ## Sample
 
-In building for the moment
+### In building for the moment,
+
+-Share Postman Collection: https://drive.google.com/file/d/1lY3yx5lqsCIn0Dqxamvj96lflXUm9bwx/view?usp=share_link
 
 ## Getting started
 
@@ -116,7 +124,7 @@ response
 }
 ```
 
-#### PATCH /ticket/{ticket_id}/status
+#### PUT /ticket/{ticket_id}/status
 
 ```jsx
 http://localhost:8000/ticket/{ticket_id}/status
@@ -155,3 +163,17 @@ Output
     ]
 }
 ```
+
+## Version
+
+### v1 deadline study case
+
+#### Improvements:
+
+-User interface
+-test
+-documentation.
+
+### Author
+
+Built by Jose Julian Mosquera Fuli.
