@@ -12,8 +12,11 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
+app.title = "Kiwibot by Xero ChatGPT"
+app.version = "v1.0"
 config = Config()
 
 origins = ["*"]
@@ -33,6 +36,7 @@ GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY
 cred = credentials.Certificate(SERVICE_ACCOUNT_KEY_FILE)
 app_test = firebase_admin.initialize_app(cred)
 db = firestore.client()
+tickets_collection = db.collection("tickets")
 
 nlp = spacy.load("en_core_web_sm")
 messages = [
@@ -144,10 +148,11 @@ class Ticket(BaseModel):
     status_changes: Optional[List[TicketStatusChange]] = []
 
 
-tickets_collection = db.collection("tickets")
-
-
-@app.post("/problem-report")
+@app.post(
+    "/problem-report",
+    tags=["Report"],
+    description="Problem report recieve and processing to return a ticker",
+)
 async def problem_report_endpoint(report: ProblemReport):
     try:
         ticket_id = str(uuid.uuid4())
@@ -219,7 +224,11 @@ def get_problem_type(text):
     return "undefined"
 
 
-@app.get("/ticket/{ticket_id}")
+@app.get(
+    "/ticket/{ticket_id}",
+    tags=["Ticket"],
+    description="Get Ticket information by id",
+)
 async def get_ticket(ticket_id: str):
     try:
         doc_ref = tickets_collection.document(ticket_id)
@@ -238,7 +247,11 @@ async def get_ticket(ticket_id: str):
         raise
 
 
-@app.patch("/ticket/{ticket_id}/status")
+@app.put(
+    "/ticket/{ticket_id}/status",
+    tags=["Ticket"],
+    description="Modify Ticket status information by id adding a reason",
+)
 async def change_ticket_status(ticket_id: str, request: Request):
     try:
         request_data = await request.json()
