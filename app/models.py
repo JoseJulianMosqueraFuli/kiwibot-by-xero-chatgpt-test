@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional, Dict
-from pydantic import BaseModel, confloat, constr
+from pydantic import BaseModel, confloat, constr, Field
 from enum import Enum
 
 
@@ -12,7 +12,7 @@ class BotStatus(str, Enum):
 
 class BotHeartbeat(BaseModel):
     bot_id: str
-    timestamp: datetime
+    timestamp: str = Field(..., regex=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
     location: Dict[constr(regex="^(lat|lon)$"), float]
     status: BotStatus
     battery_level: confloat(ge=0, le=100)

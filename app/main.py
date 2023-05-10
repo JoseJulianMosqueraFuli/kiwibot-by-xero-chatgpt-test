@@ -2,9 +2,8 @@ import uuid
 from fastapi import FastAPI, HTTPException, Request
 from app.config import Config
 from datetime import datetime
-from .firebase import tickets_collection
+from app.firebase import tickets_collection
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.models import (
     ProblemReport,

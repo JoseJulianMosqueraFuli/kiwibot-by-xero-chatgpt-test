@@ -14,7 +14,7 @@
         type="datetime-local"
         id="timestamp"
         name="timestamp"
-        pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"
+        pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
         required /><br /><br />
 
       <label for="location-lat">Location Latitude:</label>
@@ -149,7 +149,6 @@
                 `;
             document.body.appendChild(ticketInfo);
           }
-          const data = await response.json();
           console.log(data);
         } catch (error) {
           console.log(error);
