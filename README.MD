@@ -50,6 +50,24 @@ SERVICE_ACCOUNT_KEY_FILE = <your_service_account_key_file>
 GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
 ```
 
+4. Create a `keys.json` file like `.example.keys.json`, this file must be created in the fold that appear the example:
+
+```python
+{
+  "type": "tipo_de_cuenta",
+  "project_id": "id_del_proyecto",
+  "private_key_id": "id_de_la_llave_privada",
+  "private_key": "llave_privada",
+  "client_email": "correo_del_cliente",
+  "client_id": "id_del_cliente",
+  "auth_uri": "uri_de_autenticacion",
+  "token_uri": "uri_del_token",
+  "auth_provider_x509_cert_url": "url_del_proveedor_de_autenticacion_x509",
+  "client_x509_cert_url": "url_del_cliente_x509_cert"
+}
+
+```
+
 4. Build and run the Docker container:
 
 ```bash
