@@ -11,7 +11,7 @@ This is a sample API built using Python and FastAPI, consuming OpenAI. It featur
 ## Overview:
 
 In this document you can find a detailed explanation of the project setup, technologies and available features.
-This is the API built up to the deadline of the case study, in branch master.
+This is the API built up to the deadline of the case study, in branch develop.
 
 ## Index
 
@@ -21,7 +21,8 @@ This is the API built up to the deadline of the case study, in branch master.
 
 ## Sample
 
--Share Postman Collection: https://drive.google.com/file/d/1TV0KIfxWZQIAesjOSYIeUkA1sDcoK62r/view?usp=share_link
+- Video example: [Video Link](https://drive.google.com/file/d/1_uIGKtaiRQNJSLIu2Q7A2ynvM2YYJt71/view?usp=share_link) The video have copy the keys file, don't create from zero.
+- Share Postman Collection: [Postman Collection Link](https://drive.google.com/file/d/1TV0KIfxWZQIAesjOSYIeUkA1sDcoK62r/view?usp=share_link)
 
 ## Getting started
 
@@ -49,6 +50,8 @@ GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
 ```
 
 4. Create a `keys.json` file like `.example.keys.json`, this file must be created in the fold that appear the example:
+
+- NOTE: You can fin the example inside folder /app:
 
 ```python
 {
@@ -257,6 +260,7 @@ Output
 - Design a more feature User Interface, and usefull, for the moment only can use Ticket info because don't require authentication.
 
   <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get ticket, and change status. Above a simple navbar" width="500" height="500">
+
 - Updating the test, and add for the new features.
 
 ### Author
