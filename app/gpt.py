@@ -4,7 +4,7 @@ from app.config import Config
 messages = [
     {
         "role": "system",
-        "content": "You are a great Trouble Report tool to summarize error information such as software, hardware, or field(environment) within reports.",
+        "content": "You are a great Trouble Report tool to summarize error information such as software, hardware, or field within reports.",
     },
     {
         "role": "user",
@@ -30,6 +30,10 @@ messages = [
         "role": "assistant",
         "content": "Based on the report information provided, here are the decisions on the type of problem:Battery level low, Kiwibot unable to operate: Hardware (battery) problem.Robot unexpectedly rebooted during operation: Software problem.Kiwibot overheating, emitting smoke: Hardware problem (overheating).Camera malfunctioning, unable to capture images: Hardware problem (camera failure).Kiwibot unable to move due to obstruction by people nearby: Field problem (obstruction).Robot unable to navigate properly on uneven surfaces, wheels getting stuck: Hardware problem (wheel malfunction).Sensor failure, Kiwibot unable to detect obstacles: Hardware problem (sensor failure).Please note that these decisions are made based on the information provided, and there might be additional factors or context that could influence the actual determination of the issue/problem.",
     },
+    # {
+    #     "role": "user",
+    #     "content": "If you recieve a <*NOTE*: Reason> at the end of the prompt, could you return the summary, and additionaly check the reason at the note and please bring a possible solution for example: call the technique service soon.",
+    # },
 ]
 
 

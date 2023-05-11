@@ -56,6 +56,28 @@ async def problem_report_endpoint(report: ProblemReport):
 
         content = report.content
 
+        # notes = []
+
+        # if report.heartbeat.battery_level < 15.00:
+        #     notes.append("The battery is low. This could have generated the issue")
+
+        # if report.heartbeat.software_version < "v1.2":
+        #     notes.append(
+        #         "The software version is outdated. Please update to the latest version"
+        #     )
+
+        # if report.heartbeat.hardware_version < "v1.2":
+        #     notes.append(
+        #         "The hardware version is outdated. Please update to the latest version"
+        #     )
+
+        # if len(notes) > 0:
+        #     content += "\n*NOTE*: " + ", ".join(notes)
+
+        # if len(notes) == 3:
+        #     content += "\n*NOTE*: Urgent revision required."
+
+        # print(content)
         report_assistant = GPT.get_instance()
 
         response_content = report_assistant.generate_response(content)
