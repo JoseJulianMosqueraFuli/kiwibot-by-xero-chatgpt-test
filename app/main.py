@@ -2,7 +2,9 @@ import uuid
 from fastapi import FastAPI, HTTPException, Request
 from app.config import Config
 from datetime import datetime
-from app.firebase import tickets_collection
+from app.firebase import tickets_collection, creator_tickets_collection
+import firebase_admin
+from firebase_admin import auth
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from app.models import (
@@ -13,6 +15,7 @@ from app.models import (
 )
 from app.gpt import GPT
 from app.problem_utils import get_problem_location, get_problem_type
+from app.identify import sign_in_with_email_and_password
 
 
 app = FastAPI()
@@ -32,9 +35,18 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/", tags=["Home"])
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.post("/login_user", tags=["User"])
+async def login_user(request: Request):
+    form_data = await request.form()
+    email = form_data.get("email")
+    password = form_data.get("password")
+    token = sign_in_with_email_and_password(email, password)
+    return token
 
 
 @app.post(
@@ -42,7 +54,19 @@ async def read_root(request: Request):
     tags=["Report"],
     description="Problem report recieve and processing to return a ticker",
 )
-async def problem_report_endpoint(report: ProblemReport):
+async def problem_report_endpoint(report: ProblemReport, request: Request):
+    try:
+        headers = request.headers
+        bearer = headers.get("Authorization")
+        token = bearer.split()[1]
+        print("Token:", token)
+        decoded_token = auth.verify_id_token(token)
+        print("Decoded Token:", decoded_token)
+        uid = decoded_token["uid"]
+    except Exception as e:
+        print("Error:", e)
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     try:
         ticket_id = str(uuid.uuid4())
 
@@ -96,6 +120,8 @@ async def problem_report_endpoint(report: ProblemReport):
 
         ticket_dict = ticket.dict()
         tickets_collection.document(ticket_id).set(ticket_dict)
+        creator_ticket_data = {"creator_uuid": uid, "ticket_id": ticket_id}
+        creator_tickets_collection.add(creator_ticket_data)
 
         return ticket.dict()
     except Exception as e:
