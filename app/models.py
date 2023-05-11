@@ -52,3 +52,8 @@ class Ticket(BaseModel):
     bot_id: str
     status: TicketStatus
     status_changes: Optional[List[TicketStatusChange]] = []
+    assigned_agent: Optional[str]
+
+
+class AssignTicketRequest(BaseModel):
+    agent_id: str

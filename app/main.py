@@ -12,6 +12,7 @@ from app.models import (
     TicketStatus,
     TicketStatusChange,
     Ticket,
+    AssignTicketRequest,
 )
 from app.gpt import GPT
 from app.problem_utils import get_problem_location, get_problem_type
@@ -59,9 +60,7 @@ async def problem_report_endpoint(report: ProblemReport, request: Request):
         headers = request.headers
         bearer = headers.get("Authorization")
         token = bearer.split()[1]
-        print("Token:", token)
         decoded_token = auth.verify_id_token(token)
-        print("Decoded Token:", decoded_token)
         uid = decoded_token["uid"]
     except Exception as e:
         print("Error:", e)
@@ -101,7 +100,6 @@ async def problem_report_endpoint(report: ProblemReport, request: Request):
         # if len(notes) == 3:
         #     content += "\n*NOTE*: Urgent revision required."
 
-        # print(content)
         report_assistant = GPT.get_instance()
 
         response_content = report_assistant.generate_response(content)
@@ -159,6 +157,16 @@ async def get_ticket(ticket_id: str):
 )
 async def change_ticket_status(ticket_id: str, request: Request):
     try:
+        headers = request.headers
+        bearer = headers.get("Authorization")
+        token = bearer.split()[1]
+        decoded_token = auth.verify_id_token(token)
+        uid = decoded_token["uid"]
+    except Exception as e:
+        print("Error:", e)
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    try:
         request_data = await request.json()
         new_status = request_data.get("new_status")
         reason = request_data.get("reason")
@@ -194,6 +202,53 @@ async def change_ticket_status(ticket_id: str, request: Request):
             doc_ref.set(ticket.dict())
 
             return ticket.dict()
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="Ticket not found",
+            )
+    except Exception as e:
+        print(str(e))
+        raise
+
+
+@app.put(
+    "/ticket/{ticket_id}/assign",
+    tags=["Ticket"],
+    description="Assign a ticket to a support agent",
+)
+async def assign_ticket(
+    ticket_id: str, assign_request: AssignTicketRequest, request: Request
+):
+    try:
+        headers = request.headers
+        bearer = headers.get("Authorization")
+        token = bearer.split()[1]
+        decoded_token = auth.verify_id_token(token)
+        uid = decoded_token["uid"]
+    except Exception as e:
+        print("Error:", e)
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    try:
+        doc_ref = tickets_collection.document(ticket_id)
+        ticket_doc = doc_ref.get()
+
+        if ticket_doc.exists:
+            ticket_data = ticket_doc.to_dict()
+            ticket = Ticket(**ticket_data)
+
+            if ticket.status in [TicketStatus.open, TicketStatus.in_progress]:
+                ticket.assigned_agent = assign_request.agent_id
+
+                doc_ref.set(ticket.dict())
+
+                return ticket.dict()
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Ticket can only be assigned if the status is 'open' or 'in progress'",
+                )
         else:
             raise HTTPException(
                 status_code=404,
