@@ -1,8 +1,8 @@
 # NOTE :
 
-The first deadline set is May 10th at 8 AM GT (-5).
-This is the version achieved up to this point, using GPT-3.5. I have the option to use GPT-4 since I've been on the waitlist since last week.
-For the first deadline, I left the "master" branch and will continue with the "develop" branch. The second deadline is May 10th at 11 PM GT (-5).
+The second deadline is May 10th at 11 PM GMT (-5).
+
+### V2
 
 # Kiwibot-by-Xero-OpenAi-ChatGPT
 
@@ -21,9 +21,7 @@ This is the API built up to the deadline of the case study, in branch master.
 
 ## Sample
 
-### In building for the moment,
-
--Share Postman Collection: https://drive.google.com/file/d/1lY3yx5lqsCIn0Dqxamvj96lflXUm9bwx/view?usp=share_link
+-Share Postman Collection: https://drive.google.com/file/d/1TV0KIfxWZQIAesjOSYIeUkA1sDcoK62r/view?usp=share_link
 
 ## Getting started
 
@@ -82,7 +80,38 @@ docker-compose up --build
 docker-compose run fastapi python3 -m pytest
 ```
 
+for this version have breaking changes, the 3 test don't pass until the moment, require change
+
 ## Available endpoints
+
+### Login
+
+#### POST /problem-report
+
+```jsx
+http://localhost:8000/login_user
+```
+
+Input
+
+```x-www-form-urlencoded
+email =
+password =
+```
+
+Output
+
+```json
+{
+    "kind": "toolik",
+    "localId": "ID",
+    "email": "example@example.com",
+    "displayName": "kiwi-bot",
+    "idToken": "IDTOKEN", <this requiere for access>
+    "registered": true,
+    "refreshToken": "RefreshToken",
+    "expiresIn": "1200"}
+```
 
 ### Problem Report Endpoint
 
@@ -188,6 +217,36 @@ Output
 }
 ```
 
+#### PUT /ticket/{ticket_id}/assign
+
+```jsx
+http://localhost:8000/ticket/{ticket_id}/assign
+```
+
+Input
+
+```jsx
+{
+  "agent_id": "ID_DEL_AGENTE"
+}
+```
+
+Output
+
+```jsx
+{{
+    "ticket_id": "ab7dd907-14f9-4c4c-a979-f5381c9f52cf",
+    "problem_location": "Pecos County, Texas, United States",
+    "problem_type": "software",
+    "summary": "The issue with the Kiwibot could be a software problem, as no notification is received through the app. This problem is causing a communication breakdown between the delivery service and the customer, leading to inquiries about the service.",
+    "bot_id": "Pruebaid1",
+    "status": "open",
+    "status_changes": [],
+    "assigned_agent": "ID_DEL_AGENTE"
+}
+}
+```
+
 ## Version
 
 ### v2 deadline study case
@@ -195,9 +254,10 @@ Output
 #### Improvements:
 
 - Add a feature to the GPT model: prioritize the addition of notes in the model. (Restrictions: The context of GPT-3.5 is limited to 4096 tokens. GPT-4 is a multimodal model, meaning it has more space for context, enhanced creativity, and the ability to capture information beyond just text.)
-- Design a more feature User Interface
+- Design a more feature User Interface, and usefull, for the moment only can use Ticket info because don't require authentication.
 
   <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get ticket, and change status. Above a simple navbar" width="500" height="500">
+- Updating the test, and add for the new features.
 
 ### Author
 
