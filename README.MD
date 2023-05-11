@@ -76,6 +76,12 @@ docker-compose up --build
 
 5. The API should now be available at http://localhost:8000.\*
 
+6. If you require execute test:
+
+```bash
+docker-compose run fastapi python3 -m pytest
+```
+
 ## Available endpoints
 
 ### Problem Report Endpoint
@@ -93,7 +99,7 @@ Input
   "content": "My Kiwibot is moving slow and the device is hot. The hardware version is a bit old",
   "heartbeat": {
     "bot_id": "abc12435",
-    "timestamp" : "2023-05-09T12:00:00Z",
+    "timestamp" : "2023-05-09T12:00:00",
     "location": {
       "lat": 40.731,
       "lon": -73.997
@@ -184,13 +190,14 @@ Output
 
 ## Version
 
-### v1 deadline study case
+### v2 deadline study case
 
 #### Improvements:
 
--User interface
--test
--documentation.
+- Add a feature to the GPT model: prioritize the addition of notes in the model. (Restrictions: The context of GPT-3.5 is limited to 4096 tokens. GPT-4 is a multimodal model, meaning it has more space for context, enhanced creativity, and the ability to capture information beyond just text.)
+- Design a more feature User Interface
+
+  <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get ticket, and change status. Above a simple navbar" width="500" height="500">
 
 ### Author
 
