@@ -1,17 +1,11 @@
-# NOTE :
-
-The second deadline is May 10th at 11 PM GMT (-5).
-
-### V2
-
 # Kiwibot-by-Xero-OpenAi-ChatGPT
 
-This is a sample API built using Python and FastAPI, consuming OpenAI. It features an endpoint to chat with ChatGPT to support report problem for kiwi.
+This is a sample API built using Python and FastAPI, consuming OpenAI. It features an endpoint to chat with ChatGPT to support reporting problems for Kiwibot.
 
 ## Overview:
 
-In this document you can find a detailed explanation of the project setup, technologies and available features.
-This is the API built up to the deadline of the case study, in branch develop.
+In this document, you can find a detailed explanation of the project setup, technologies, and available features.
+This is the API built up to the deadline of the case study.
 
 ## Index
 
@@ -49,9 +43,9 @@ SERVICE_ACCOUNT_KEY_FILE = <your_service_account_key_file>
 GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
 ```
 
-4. Create a `keys.json` file like `.example.keys.json`, this file must be created in the fold that appear the example:
+4. Create a `keys.json` file like `.example.keys.json`, this file must be created in the fold that appears in the example:
 
-- NOTE: You can fin the example inside folder /app:
+- NOTE: You can find the example inside the folder /app:
 
 ```python
 {
@@ -69,21 +63,21 @@ GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
 
 ```
 
-4. Build and run the Docker container:
+5. Build and run the Docker container:
 
 ```bash
 docker-compose up --build
 ```
 
-5. The API should now be available at http://localhost:8000.\*
+6. The API should now be available at http://localhost:8000.\*
 
-6. If you require execute test:
+7. If you require to execute a tests:
 
 ```bash
-docker-compose run fastapi python3 -m pytest
+docker-compose run fastAPI python3 -m pytest
 ```
 
-for this version have breaking changes, the 3 test don't pass until the moment, require change
+for this version have to break changes, the 3 tests don't pass until the moment, requiring a change
 
 ## Available endpoints
 
@@ -257,9 +251,9 @@ Output
 #### Improvements:
 
 - Add a feature to the GPT model: prioritize the addition of notes in the model. (Restrictions: The context of GPT-3.5 is limited to 4096 tokens. GPT-4 is a multimodal model, meaning it has more space for context, enhanced creativity, and the ability to capture information beyond just text.)
-- Design a more feature User Interface, and usefull, for the moment only can use Ticket info because don't require authentication.
+- Design a more feature User Interface, and useful, for the moment only can use Ticket info because don't require authentication.
 
-  <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get ticket, and change status. Above a simple navbar" width="500" height="500">
+  <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get a ticket, and change status. Above a simple navbar" width="500" height="500">
 
 - Updating the test, and add for the new features.
 
