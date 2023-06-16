@@ -2,3 +2,4 @@
 .vscode
 /gpt-test
 /app/keys.json
+**/__pycache__/

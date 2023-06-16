@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kiwibot Form</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous" />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      h1 {
+        color: #007bff;
+      }
+
+      label {
+        color: #007bff;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+      }
+
+      button[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #0069d9;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <a class="navbar-brand" href="https://www.kiwibot.com/">Kiwibot</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="https://www.kiwibot.com/about-us"
+              >About us</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <h1>Problem Report</h1>
+    <form id="problem-report-form">
+      <label for="bot-id">Bot ID:</label>
+      <input type="text" id="bot-id" name="bot_id" required /><br /><br />
+
+      <label for="timestamp">Timestamp:</label>
+      <input
+        type="text"
+        id="timestamp"
+        name="timestamp"
+        pattern="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$"
+        placeholder="yyyy-mm-ddThh:mm:ss"
+        required /><br /><br />
+
+      <label for="location-lat">Location Latitude:</label>
+      <input
+        type="number"
+        step="0.001"
+        id="location-lat"
+        name="location_lat"
+        min="-90"
+        max="90"
+        required /><br /><br />
+
+      <label for="location-lon">Location Longitude:</label>
+      <input
+        type="number"
+        step="0.001"
+        id="location-lon"
+        name="location_lon"
+        min="-180"
+        max="180"
+        required /><br /><br />
+
+      <label for="bot-status">Bot Status:</label>
+      <select id="bot-status" name="bot-status">
+        <option value="available">available</option>
+        <option value="busy">busy</option>
+        <option value="reserved">reserved</option></select
+      ><br /><br />
+
+      <label for="battery-level">Battery Level:</label>
+      <input
+        type="number"
+        step="0.01"
+        id="battery-level"
+        name="battery_level"
+        min="0"
+        max="100"
+        required /><br /><br />
+
+      <label for="software-version">Software Version:</label>
+      <input
+        type="text"
+        id="software-version"
+        name="software_version" /><br /><br />
+
+      <label for="hardware-version">Hardware Version:</label>
+      <input
+        type="text"
+        id="hardware-version"
+        name="hardware_version" /><br /><br />
+
+      <label for="content">Content:</label>
+      <textarea id="content" name="content"></textarea><br /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <h1>Ticket Info</h1>
+    <form id="ticket-info-form">
+      <label for="ticket-id-information">Ticket ID:</label>
+      <input
+        type="text"
+        id="ticket-id-information"
+        name="ticket-id-information"
+        required /><br /><br />
+
+      <input type="submit" value="Submit" />
+    </form>
+
+    <h1>Ticket Status Change</h1>
+    <form id="ticket-status-form">
+      <label for="ticket-id-status">Ticket ID:</label>
+      <input
+        type="text"
+        id="ticket-id-status"
+        name="ticket-id-status"
+        required /><br /><br />
+      <label for="new-status">New Status:</label>
+      <select id="new-status" name="new_status">
+        <option value="open">open</option>
+        <option value="in progress">in progress</option>
+        <option value="closed">closed</option></select
+      ><br /><br />
+
+      <label for="reason">Reason:</label>
+      <input type="text" id="reason" name="reason" required /><br /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+    <script>
+      const problemReportForm = document.getElementById("problem-report-form");
+      const ticketInformation = document.getElementById("ticket-info-form");
+      const ticketStatusForm = document.getElementById("ticket-status-form");
+
+      problemReportForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(problemReportForm);
+        const payload = {
+          content: formData.get("content"),
+          heartbeat: {
+            bot_id: formData.get("bot_id"),
+            timestamp: formData.get("timestamp"),
+            location: {
+              lat: parseFloat(formData.get("location_lat")),
+              lon: parseFloat(formData.get("location_lon")),
+            },
+            status: formData.get("bot-status"),
+            battery_level: parseFloat(formData.get("battery_level")),
+            software_version: formData.get("software_version"),
+            hardware_version: formData.get("hardware_version"),
+          },
+        };
+        try {
+          const response = await fetch("/problem-report", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const ticketInfo = document.createElement("div");
+            ticketInfo.innerHTML = `
+                    <h2>Ticket Information</h2>
+                    <p>Ticket ID: ${data.ticket_id}</p>
+                    <p>Problem Location: ${data.problem_location}</p>
+                    <p>Problem Type: ${data.problem_type}</p>
+                    <p>Summary: ${data.summary}</p>
+                    <p>Bot ID: ${data.bot_id}</p>
+                    <p>Status: ${data.status}</p>
+                `;
+            document.body.appendChild(ticketInfo);
+          }
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+      ticketStatusForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const ticketId = document.getElementById("ticket-id-status").value;
+
+        const payload = {
+          new_status: document.getElementById("new-status").value,
+          reason: document.getElementById("reason").value,
+        };
+
+        try {
+          const response = await fetch(`/ticket/${ticketId}/status`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+
+            const statusChangesContainer = document.createElement("div");
+            statusChangesContainer.innerHTML = "<h3>Status Changes:</h3>";
+
+            data.status_changes.forEach((change) => {
+              const changeInfo = document.createElement("p");
+              changeInfo.innerHTML = `
+                <strong>Status:</strong> ${change.status}<br>
+                <strong>Timestamp:</strong> ${change.timestamp}<br>
+                <strong>Reason:</strong> ${change.reason}<br>
+                `;
+              statusChangesContainer.appendChild(changeInfo);
+            });
+
+            document.body.appendChild(statusChangesContainer);
+            const ticketInfo = document.createElement("div");
+            ticketInfo.innerHTML = `
+                    <h2>Ticket Information</h2>
+                    <p>Ticket ID: ${data.ticket_id}</p>
+                    <p>Problem Location: ${data.problem_location}</p>
+                    <p>Problem Type: ${data.problem_type}</p>
+                    <p>Summary: ${data.summary}</p>
+                    <p>Bot ID: ${data.bot_id}</p>
+                    <p>Status: ${data.status}</p>
+                `;
+            document.body.appendChild(ticketInfo);
+          } else {
+            const errorData = await response.json();
+            console.log(errorData.detail);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+      ticketInformation.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const ticketId = document.getElementById("ticket-id-information").value;
+
+        try {
+          const response = await fetch(`/ticket/${ticketId}`);
+          const data = await response.json();
+
+          if (response.ok) {
+            if (data.status_changes) {
+              const statusChangesContainer = document.createElement("div");
+              statusChangesContainer.innerHTML = "<h3>Status Changes:</h3>";
+
+              data.status_changes.forEach((change) => {
+                const changeInfo = document.createElement("p");
+                changeInfo.innerHTML = `
+                    <strong>Status:</strong> ${change.status}<br>
+                    <strong>Timestamp:</strong> ${change.timestamp}<br>
+                    <strong>Reason:</strong> ${change.reason}<br>
+                `;
+                statusChangesContainer.appendChild(changeInfo);
+              });
+
+              document.body.appendChild(statusChangesContainer);
+            }
+            const ticketInfo = document.createElement("div");
+            ticketInfo.innerHTML = `
+                    <h2>Ticket Information</h2>
+                    <p>Ticket ID: ${data.ticket_id}</p>
+                    <p>Problem Location: ${data.problem_location}</p>
+                    <p>Problem Type: ${data.problem_type}</p>
+                    <p>Summary: ${data.summary}</p>
+                    <p>Bot ID: ${data.bot_id}</p>
+                    <p>Status: ${data.status}</p>
+                `;
+            document.body.appendChild(ticketInfo);
+          } else {
+            // Manejar el caso de que el ticket no se encuentre
+            console.log("Ticket not found");
+            alert("Ticket not found");
+          }
+        } catch (error) {
+          alert(error);
+          console.error(error);
+        }
+      });
+    </script>
+  </body>
+</html>
