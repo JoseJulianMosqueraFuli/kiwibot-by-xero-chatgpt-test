@@ -51,7 +51,7 @@ async def login_user(request: Request):
 
 
 @app.post(
-    "/problem-report",
+    "/v1/problem-reports",
     tags=["Report"],
     description="Problem report recieve and processing to return a ticker",
 )
@@ -128,7 +128,7 @@ async def problem_report_endpoint(report: ProblemReport, request: Request):
 
 
 @app.get(
-    "/ticket/{ticket_id}",
+    "/v1/ticket/{ticket_id}",
     tags=["Ticket"],
     description="Get Ticket information by id",
 )
@@ -151,7 +151,7 @@ async def get_ticket(ticket_id: str):
 
 
 @app.put(
-    "/ticket/{ticket_id}/status",
+    "/v1/ticket/{ticket_id}/status",
     tags=["Ticket"],
     description="Modify Ticket status information by id adding a reason",
 )
@@ -213,7 +213,7 @@ async def change_ticket_status(ticket_id: str, request: Request):
 
 
 @app.put(
-    "/ticket/{ticket_id}/assign",
+    "/v1/ticket/{ticket_id}/assign",
     tags=["Ticket"],
     description="Assign a ticket to a support agent",
 )

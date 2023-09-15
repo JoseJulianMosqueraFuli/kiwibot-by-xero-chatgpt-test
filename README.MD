@@ -83,7 +83,7 @@ for this version have to break changes, the 3 tests don't pass until the moment,
 
 ### Login
 
-#### POST /problem-report
+#### POST /login_user
 
 ```jsx
 http://localhost:8000/login_user
@@ -112,10 +112,10 @@ Output
 
 ### Problem Report Endpoint
 
-#### POST /problem-report
+#### POST /v1/problem-reports
 
 ```jsx
-http://localhost:8000/problem-report
+http://localhost:8000/v1/problem-reports
 ```
 
 Input
@@ -154,10 +154,10 @@ Response Ticket
 
 ### Ticket
 
-#### GET /ticket/{ticket_id}
+#### GET /v1/ticket/{ticket_id}
 
 ```jsx
-http://localhost:8000/ticket/95b13970-2819-4684-8ef5-2b8aef8c825c
+http://localhost:8000/v1/ticket/95b13970-2819-4684-8ef5-2b8aef8c825c
 ```
 
 response
@@ -174,10 +174,10 @@ response
 }
 ```
 
-#### PUT /ticket/{ticket_id}/status
+#### PUT /v1/ticket/{ticket_id}/status
 
 ```jsx
-http://localhost:8000/ticket/{ticket_id}/status
+http://localhost:8000/v1/ticket/{ticket_id}/status
 ```
 
 Input
@@ -214,10 +214,10 @@ Output
 }
 ```
 
-#### PUT /ticket/{ticket_id}/assign
+#### PUT /v1/ticket/{ticket_id}/assign
 
 ```jsx
-http://localhost:8000/ticket/{ticket_id}/assign
+http://localhost:8000/v1/ticket/{ticket_id}/assign
 ```
 
 Input
