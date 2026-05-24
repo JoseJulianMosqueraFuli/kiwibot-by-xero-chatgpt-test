@@ -3,3 +3,4 @@
 /gpt-test
 /app/keys.json
 **/__pycache__/
+.venv
