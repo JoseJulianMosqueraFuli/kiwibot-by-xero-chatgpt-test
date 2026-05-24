@@ -1,131 +1,164 @@
 # Kiwibot-by-Xero-OpenAi-ChatGPT
 
-This is a sample API built using Python and FastAPI, consuming OpenAI. It features an endpoint to chat with ChatGPT to support reporting problems for Kiwibot.
+A Python FastAPI application for managing Kiwibot problem reports. It integrates with AI providers (OpenAI GPT and AWS Bedrock) to analyze robot issue reports, generate tickets, and track their resolution.
 
-## Overview:
+## Features
 
-In this document, you can find a detailed explanation of the project setup, technologies, and available features.
-This is the API built up to the deadline of the case study.
+- **Problem Report Processing**: Receive and analyze robot problem reports using AI
+- **Ticket Management**: Create, retrieve, update status, and assign tickets
+- **Geolocation**: Reverse geocoding to identify problem locations
+- **Authentication**: Firebase-based user authentication
+- **AI Providers**: Support for OpenAI GPT and AWS Bedrock (Claude)
+- **Structured Logging**: JSON-formatted logs for production monitoring
+- **Request Tracing**: X-Request-ID middleware for request correlation
 
-## Index
+## Tech Stack
 
-1. [ Project sample ](#sample)
-2. [ Getting started ](#getting-started)
-3. [ Available endpoints ](#available-endpoints)
+- **Framework**: FastAPI
+- **AI/ML**: OpenAI GPT-3.5, AWS Bedrock (Claude), LangChain, LangGraph
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
+- **Geocoding**: Google Maps API, Nominatim (OpenStreetMap)
+- **NLP**: spaCy
+- **Testing**: pytest, pytest-mock, httpx
+- **Containerization**: Docker, Docker Compose
 
-## Sample
+## Getting Started
 
-- Video example: [Video Link](https://drive.google.com/file/d/1_uIGKtaiRQNJSLIu2Q7A2ynvM2YYJt71/view?usp=share_link) The video have copy the keys file, don't create from zero.
-- Share Postman Collection: [Postman Collection Link](https://drive.google.com/file/d/1TV0KIfxWZQIAesjOSYIeUkA1sDcoK62r/view?usp=share_link)
+### Prerequisites
 
-## Getting started
+- Python 3.11+
+- Docker & Docker Compose
+- OpenAI API key
+- Firebase service account credentials
+- Google Maps API key (optional, fallback geocoding)
+- AWS credentials (optional, for Bedrock)
 
-To run this API on your local machine, follow these steps:
+### Setup
 
 1. Clone the repository:
 
 ```bash
 git clone git@github.com:JoseJulianMosqueraFuli/kiwibot-by-xero-chatgpt-test.git
-```
-
-2. Navigate into the cloned directory:
-
-```bash
 cd kiwibot-by-xero-chatgpt-test
 ```
 
-3. Create a `.env` file like `.env.example` :
+2. Create and activate a virtual environment:
 
-```python
-OPEN_API_KEY = <your_openai_api_key>
-FIREBASE_API_KEY = <your_firebase_api_key>
-SERVICE_ACCOUNT_KEY_FILE = <your_service_account_key_file>
-GOOGLE_MAPS_API_KEY = <your_google_maps_api_keu>
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-4. Create a `keys.json` file like `.example.keys.json`, this file must be created in the fold that appears in the example:
+3. Create a `.env` file based on `.env.example`:
 
-- NOTE: You can find the example inside the folder /app:
+```env
+OPEN_API_KEY=your_openai_api_key
+FIREBASE_API_KEY=your_firebase_api_key
+SERVICE_ACCOUNT_KEY_FILE=path/to/service-account.json
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
+```
 
-```python
+4. Create a Firebase service account key file (`service-account.json`):
+
+```json
 {
-  "type": "tipo_de_cuenta",
-  "project_id": "id_del_proyecto",
-  "private_key_id": "id_de_la_llave_privada",
-  "private_key": "llave_privada",
-  "client_email": "correo_del_cliente",
-  "client_id": "id_del_cliente",
-  "auth_uri": "uri_de_autenticacion",
-  "token_uri": "uri_del_token",
-  "auth_provider_x509_cert_url": "url_del_proveedor_de_autenticacion_x509",
-  "client_x509_cert_url": "url_del_cliente_x509_cert"
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "your-private-key-id",
+  "private_key": "-----BEGIN RSA PRIVATE KEY-----\n...",
+  "client_email": "firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com",
+  "client_id": "your-client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/..."
 }
-
 ```
 
-5. Build and run the Docker container:
+5. Download the spaCy English model:
+
+```bash
+python -m spacy download en_core_web_sm
+```
+
+### Running with Docker
 
 ```bash
 docker-compose up --build
 ```
 
-6. The API should now be available at http://localhost:8000.\*
+The API will be available at `http://localhost:8000`.
 
-7. If you require to execute a tests:
+### Running Locally
 
 ```bash
-docker-compose run fastAPI python3 -m pytest
+source .venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-for this version have to break changes, the 3 tests don't pass until the moment, requiring a change
+### Running Tests
 
-## Available endpoints
+```bash
+# With virtual environment
+source .venv/bin/activate
+pytest tests/ -v
 
-### Login
+# With Docker
+docker-compose run --rm fastAPI pytest tests/ -v
+```
+
+## API Endpoints
+
+### Authentication
 
 #### POST /login_user
 
-```jsx
-http://localhost:8000/login_user
+Authenticate a user with email and password.
+
+**Request** (`x-www-form-urlencoded`):
+```
+email=user@example.com
+password=yourpassword
 ```
 
-Input
-
-```x-www-form-urlencoded
-email =
-password =
-```
-
-Output
-
+**Response**:
 ```json
 {
-    "kind": "toolik",
-    "localId": "ID",
-    "email": "example@example.com",
-    "displayName": "kiwi-bot",
-    "idToken": "IDTOKEN", <this requiere for access>
-    "registered": true,
-    "refreshToken": "RefreshToken",
-    "expiresIn": "1200"}
+  "kind": "toolik",
+  "localId": "USER_ID",
+  "email": "user@example.com",
+  "displayName": "kiwi-bot",
+  "idToken": "ID_TOKEN",
+  "registered": true,
+  "refreshToken": "REFRESH_TOKEN",
+  "expiresIn": "1200"
+}
 ```
 
-### Problem Report Endpoint
+### Problem Reports
 
 #### POST /v1/problem-reports
 
-```jsx
-http://localhost:8000/v1/problem-reports
+Submit a problem report and receive a generated ticket.
+
+**Headers**:
+```
+Authorization: Bearer <idToken>
 ```
 
-Input
-
-```jsx
+**Request Body**:
+```json
 {
   "content": "My Kiwibot is moving slow and the device is hot. The hardware version is a bit old",
   "heartbeat": {
     "bot_id": "abc12435",
-    "timestamp" : "2023-05-09T12:00:00",
+    "timestamp": "2023-05-09T12:00:00",
     "location": {
       "lat": 40.731,
       "lon": -73.997
@@ -138,125 +171,144 @@ Input
 }
 ```
 
-Response Ticket
-
-```jsx
+**Response**:
+```json
 {
-    "ticket_id": "77af15af-4536-435d-bd2d-323c3707e2cf",
-    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
-    "problem_type": "hardware",
-    "summary": "The Kiwibot is facing a hardware problem that is causing the reduced speed and overheating. Given that the hardware version is old, it might be necessary to replace certain components or upgrade the Kiwibot to resolve the problem. Further investigation is recommended to identify the root cause of the issue.",
-    "bot_id": "abc12435",
-    "status": "open",
-    "status_changes": []
+  "ticket_id": "77af15af-4536-435d-bd2d-323c3707e2cf",
+  "problem_location": "New York University, Bond Street, Manhattan, New York, 10012, United States",
+  "problem_type": "hardware",
+  "summary": "The Kiwibot is facing a hardware problem causing reduced speed and overheating. The old hardware version may require component replacement.",
+  "bot_id": "abc12435",
+  "status": "open",
+  "status_changes": [],
+  "assigned_agent": null
 }
 ```
 
-### Ticket
+### Tickets
 
 #### GET /v1/ticket/{ticket_id}
 
-```jsx
-http://localhost:8000/v1/ticket/95b13970-2819-4684-8ef5-2b8aef8c825c
-```
+Retrieve ticket information by ID.
 
-response
-
-```jsx
+**Response**:
+```json
 {
-    "ticket_id": "95b13970-2819-4684-8ef5-2b8aef8c825c",
-    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
-    "problem_type": "hardware",
-    "summary": "The hardware issue with the Kiwibot at the NY location is related to the wheels repeatedly getting stuck when attempting to navigate uneven surfaces.",
-    "bot_id": "abc12435",
-    "status": "open",
-    "status_changes": []
+  "ticket_id": "95b13970-2819-4684-8ef5-2b8aef8c825c",
+  "problem_location": "New York University, Bond Street, Manhattan, New York, 10012, United States",
+  "problem_type": "hardware",
+  "summary": "The hardware issue with the Kiwibot is related to wheels getting stuck on uneven surfaces.",
+  "bot_id": "abc12435",
+  "status": "open",
+  "status_changes": [],
+  "assigned_agent": null
 }
 ```
 
 #### PUT /v1/ticket/{ticket_id}/status
 
-```jsx
-http://localhost:8000/v1/ticket/{ticket_id}/status
+Update ticket status with a reason.
+
+**Headers**:
+```
+Authorization: Bearer <idToken>
 ```
 
-Input
-
-```jsx
+**Request Body**:
+```json
 {
   "new_status": "closed",
-  "reason": "Ticket is finish reviewed"
+  "reason": "Ticket is finished and reviewed"
 }
 ```
 
-Output
-
-```jsx
+**Response**:
+```json
 {
-    "ticket_id": "2575574d-26dd-485c-8a70-80ca42b52f56",
-    "problem_location": "New York University, Bond Street, Manhattan Community Board 2, Manhattan, New York County, City of New York, New York, 10012, United States",
-    "problem_type": "hardware",
-    "summary": "Issue Reporting Ticket\n\nLocation: NY\n\nType of Issue: Hardware\n\nDescription of Issue: The wheels of the Kiwibot are not moving properly and are getting stuck when navigating uneven surfaces.\n\nSteps Taken to Reproduce Issue: Navigating the Kiwibot on uneven surfaces.\n\nRelevant Information: The Kiwibot is also having trouble navigating around obstacles and may require additional testing.\n\nPriority Level: High\n\nDate Submitted: [Current Date] \n\nThank you for your attention to this matter. Please let me know if any additional information is needed.",
-    "bot_id": "abc123",
-    "status": "closed",
-    "status_changes": [
-        {
-            "timestamp": "2023-05-09T14:34:45.133064+00:00",
-            "status": "in progress",
-            "reason": "Ticket is being worked on"
-        },
-        {
-            "timestamp": "2023-05-09T20:18:02.314041",
-            "status": "closed",
-            "reason": "Ticket is finish reviewed"
-        }
-    ]
+  "ticket_id": "2575574d-26dd-485c-8a70-80ca42b52f56",
+  "problem_location": "New York University, Bond Street, Manhattan, New York, 10012, United States",
+  "problem_type": "hardware",
+  "summary": "The wheels of the Kiwibot are not moving properly on uneven surfaces.",
+  "bot_id": "abc123",
+  "status": "closed",
+  "status_changes": [
+    {
+      "timestamp": "2023-05-09T14:34:45.133064+00:00",
+      "status": "in progress",
+      "reason": "Ticket is being worked on"
+    },
+    {
+      "timestamp": "2023-05-09T20:18:02.314041",
+      "status": "closed",
+      "reason": "Ticket is finished and reviewed"
+    }
+  ],
+  "assigned_agent": null
 }
 ```
 
 #### PUT /v1/ticket/{ticket_id}/assign
 
-```jsx
-http://localhost:8000/v1/ticket/{ticket_id}/assign
+Assign a ticket to a support agent.
+
+**Headers**:
+```
+Authorization: Bearer <idToken>
 ```
 
-Input
-
-```jsx
+**Request Body**:
+```json
 {
-  "agent_id": "ID_DEL_AGENTE"
+  "agent_id": "AGENT_ID"
 }
 ```
 
-Output
-
-```jsx
-{{
-    "ticket_id": "ab7dd907-14f9-4c4c-a979-f5381c9f52cf",
-    "problem_location": "Pecos County, Texas, United States",
-    "problem_type": "software",
-    "summary": "The issue with the Kiwibot could be a software problem, as no notification is received through the app. This problem is causing a communication breakdown between the delivery service and the customer, leading to inquiries about the service.",
-    "bot_id": "Pruebaid1",
-    "status": "open",
-    "status_changes": [],
-    "assigned_agent": "ID_DEL_AGENTE"
-}
+**Response**:
+```json
+{
+  "ticket_id": "ab7dd907-14f9-4c4c-a979-f5381c9f52cf",
+  "problem_location": "Pecos County, Texas, United States",
+  "problem_type": "software",
+  "summary": "The Kiwibot has a software problem - no notification received through the app.",
+  "bot_id": "Pruebaid1",
+  "status": "open",
+  "status_changes": [],
+  "assigned_agent": "AGENT_ID"
 }
 ```
 
-## Version
+## Architecture
 
-### v2 deadline study case
+```
+app/
+├── ai/                    # AI provider implementations
+│   ├── bedrock.py         # AWS Bedrock (Claude) provider
+│   ├── prompts.py         # LangChain prompt templates
+│   ├── provider.py        # Abstract AI provider interface
+│   └── workflow.py        # LangGraph workflow for report processing
+├── templates/             # Jinja2 HTML templates
+├── config.py              # Application configuration
+├── exceptions.py          # Custom exception classes
+├── firebase.py            # Firebase Firestore client (lazy init)
+├── gpt.py                 # OpenAI GPT provider
+├── identify.py            # Firebase authentication helper
+├── logging_config.py      # Structured JSON logging
+├── main.py                # FastAPI application and routes
+├── middleware.py          # Request ID middleware
+├── models.py              # Pydantic data models
+└── problem_utils.py       # Geocoding and problem type detection
+```
 
-#### Improvements:
+## Improvements Made
 
-- Add a feature to the GPT model: prioritize the addition of notes in the model. (Restrictions: The context of GPT-3.5 is limited to 4096 tokens. GPT-4 is a multimodal model, meaning it has more space for context, enhanced creativity, and the ability to capture information beyond just text.)
-- Design a more feature User Interface, and useful, for the moment only can use Ticket info because don't require authentication.
+- **Pydantic v2 Compatibility**: Updated deprecated `constr`, `confloat`, and `.dict()` to modern equivalents
+- **OpenAI API v1**: Migrated from legacy `openai.ChatCompletion` to `openai.ChatCompletions` client
+- **Authentication Middleware**: Extracted duplicated auth logic into reusable `get_current_user` dependency
+- **Structured Logging**: Replaced `print()` statements with proper JSON-formatted logging
+- **Lazy Initialization**: Firebase and geocoder clients now initialize on-demand
+- **Request ID Middleware**: Added `X-Request-ID` header for request tracing
+- **Test Coverage**: Fixed test endpoints and added proper mocking for external services
 
-  <img src="docs/images/Front.png" alt="Simple Frontend for this app, that contains problem report, get a ticket, and change status. Above a simple navbar" width="500" height="500">
-
-- Updating the test, and add for the new features.
-
-### Author
+## Author
 
 Built by Jose Julian Mosquera Fuli.
