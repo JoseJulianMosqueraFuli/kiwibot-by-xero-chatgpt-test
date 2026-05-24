@@ -8,7 +8,8 @@ from app.firebase import get_tickets_collection, get_creator_tickets_collection
 import firebase_admin
 from firebase_admin import auth
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from pathlib import Path
 from app.middleware import RequestIDMiddleware
 from app.models import (
     ProblemReport,
@@ -29,7 +30,6 @@ app = FastAPI()
 app.title = "Kiwibot by Xero ChatGPT"
 app.version = "v1.0"
 config = Config()
-templates = Jinja2Templates(directory="app/templates")
 
 security = HTTPBearer()
 
@@ -55,8 +55,9 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 
 @app.get("/", tags=["Home"])
-async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def read_root():
+    html_file = Path("app/templates/index.html")
+    return HTMLResponse(content=html_file.read_text(encoding="utf-8"))
 
 
 @app.post("/login_user", tags=["User"])
