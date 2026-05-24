@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import List, Optional, Dict
-from pydantic import BaseModel, confloat, constr, Field
+from typing import List, Optional, Dict, Annotated
+from pydantic import BaseModel, Field, StringConstraints
 from enum import Enum
 
 
@@ -12,10 +12,10 @@ class BotStatus(str, Enum):
 
 class BotHeartbeat(BaseModel):
     bot_id: str
-    timestamp: str = Field(..., regex=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
-    location: Dict[constr(regex="^(lat|lon)$"), float]
+    timestamp: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$")
+    location: Dict[Annotated[str, StringConstraints(pattern=r"^(lat|lon)$")], float]
     status: BotStatus
-    battery_level: confloat(ge=0, le=100)
+    battery_level: float = Field(..., ge=0, le=100)
     software_version: str
     hardware_version: str
 
@@ -51,8 +51,8 @@ class Ticket(BaseModel):
     summary: str
     bot_id: str
     status: TicketStatus
-    status_changes: Optional[List[TicketStatusChange]] = []
-    assigned_agent: Optional[str]
+    status_changes: List[TicketStatusChange] = []
+    assigned_agent: Optional[str] = None
 
 
 class AssignTicketRequest(BaseModel):
