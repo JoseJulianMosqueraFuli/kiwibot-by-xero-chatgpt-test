@@ -1,4 +1,4 @@
-nofrom openai import OpenAI
+from openai import OpenAI
 from app.config import Config
 from app.logging_config import get_logger
 
