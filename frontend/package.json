@@ -25,5 +25,10 @@
     "jsdom": "^30.0.0",
     "typescript": "^5.9.0",
     "vitest": "^4.1.10"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
