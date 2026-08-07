@@ -49,13 +49,12 @@ def _cleanup(patches):
         p.stop()
 
 
-def test_happy_path_get_root():
+def test_health_check():
     client, _, _, patches = _create_test_client()
     try:
-        response = client.get("/")
+        response = client.get("/health")
         assert response.status_code == 200
-    except TypeError:
-        pytest.skip("Jinja2/Starlette compatibility issue with template caching")
+        assert response.json() == {"status": "ok"}
     finally:
         _cleanup(patches)
 
