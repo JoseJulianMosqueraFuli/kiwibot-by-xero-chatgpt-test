@@ -6,6 +6,7 @@ load_dotenv()
 
 class Config:
     OPEN_API_KEY = os.getenv("OPEN_API_KEY")
+    AI_PROVIDER = os.getenv("AI_PROVIDER", "openai")
     SERVICE_ACCOUNT_KEY_FILE = os.getenv("SERVICE_ACCOUNT_KEY_FILE")
     GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
     FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")

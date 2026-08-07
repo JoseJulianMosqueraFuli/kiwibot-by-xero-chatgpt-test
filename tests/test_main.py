@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 from app.models import ProblemReport, ProblemType, TicketStatus
 from datetime import datetime, timezone
 
@@ -15,10 +15,11 @@ def _create_test_client():
     mock_db = MagicMock()
     mock_db.collection.side_effect = lambda name: mock_collection if name == "tickets" else mock_creator_collection
 
-    mock_gpt = MagicMock()
-    gpt_instance = MagicMock()
-    gpt_instance.generate_response.return_value = "hardware problem with the wheels"
-    mock_gpt.get_instance.return_value = gpt_instance
+    provider = AsyncMock()
+    provider.summarize_report.return_value = {
+        "summary": "hardware problem with the wheels",
+        "problem_type": "hardware",
+    }
 
     patches = [
         patch("firebase_admin.initialize_app"),
@@ -27,7 +28,7 @@ def _create_test_client():
         patch("app.main.get_tickets_collection", return_value=mock_collection),
         patch("app.main.get_creator_tickets_collection", return_value=mock_creator_collection),
         patch("app.main.auth.verify_id_token", return_value={"uid": "test_user_123"}),
-        patch("app.gpt.GPT.get_instance", return_value=gpt_instance),
+        patch("app.ai.OpenAIProvider", return_value=provider),
     ]
 
     for p in patches:
@@ -79,9 +80,7 @@ def test_problem_report_endpoint_valid_input():
             },
         )
 
-        with patch("app.main.get_problem_location", return_value="Mexico City, Mexico"), \
-             patch("app.main.get_problem_type", return_value=ProblemType.hardware):
-
+        with patch("app.main.get_problem_location", return_value="Mexico City, Mexico"):
             response = client.post(
                 "/v1/problem-reports",
                 json=report.model_dump(),
@@ -93,6 +92,7 @@ def test_problem_report_endpoint_valid_input():
         assert "ticket_id" in ticket_dict
         assert ticket_dict["bot_id"] == "bot_123"
         assert ticket_dict["status"] == "open"
+        assert ticket_dict["problem_type"] == "hardware"
         mock_collection.document.assert_called_once()
     finally:
         _cleanup(patches)

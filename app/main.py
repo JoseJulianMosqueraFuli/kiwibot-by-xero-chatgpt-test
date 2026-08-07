@@ -16,8 +16,8 @@ from app.models import (
     Ticket,
     AssignTicketRequest,
 )
-from app.gpt import GPT
-from app.problem_utils import get_problem_location, get_problem_type
+from app.ai import get_report_provider
+from app.problem_utils import get_problem_location
 from app.identify import sign_in_with_email_and_password
 from app.logging_config import setup_logging, get_logger
 
@@ -82,8 +82,10 @@ async def problem_report_endpoint(report: ProblemReport, uid: str = Depends(get_
             )
 
         content = report.content
-        report_assistant = GPT.get_instance()
-        response_content = report_assistant.generate_response(content)
+        provider = get_report_provider()
+        analysis = await provider.summarize_report(content)
+        response_content = analysis["summary"]
+        problem_type = analysis["problem_type"]
 
         ticket_id = str(uuid.uuid4())
         ticket = Ticket(
@@ -92,7 +94,7 @@ async def problem_report_endpoint(report: ProblemReport, uid: str = Depends(get_
                 report.heartbeat.location["lat"],
                 report.heartbeat.location["lon"],
             ),
-            problem_type=get_problem_type(response_content),
+            problem_type=problem_type,
             summary=response_content,
             bot_id=report.heartbeat.bot_id,
             status=TicketStatus.open,
