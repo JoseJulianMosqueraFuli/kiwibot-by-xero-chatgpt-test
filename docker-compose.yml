@@ -11,3 +11,14 @@ services:
       - "80:80"
     depends_on:
       - api
+
+  test-api:
+    build: .
+    command: pytest tests/ -v
+    env_file: .env
+
+  test-frontend:
+    build:
+      context: ./frontend
+      target: build
+    command: pnpm test
