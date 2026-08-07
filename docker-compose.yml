@@ -1,8 +1,13 @@
-version: "3"
 services:
-  fastapi:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  api:
+    build: .
     ports:
       - "8000:8000"
+    env_file: .env
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
