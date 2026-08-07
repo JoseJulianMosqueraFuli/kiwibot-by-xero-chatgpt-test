@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LoginForm from "../src/components/LoginForm";
 import ReportForm from "../src/components/ReportForm";
@@ -40,9 +40,13 @@ describe("ReportForm", () => {
     render(<ReportForm onSubmit={onSubmit} />);
 
     await user.type(screen.getByLabelText(/bot id/i), "bot_123");
+    fireEvent.change(screen.getByLabelText(/timestamp/i), {
+      target: { value: "2023-05-10T12:00" },
+    });
     await user.type(screen.getByLabelText(/issue description/i), "El bot no responde");
     await user.type(screen.getByLabelText(/latitude/i), "19.4326");
     await user.type(screen.getByLabelText(/longitude/i), "-99.1332");
+    await user.type(screen.getByLabelText(/battery level/i), "80");
     await user.click(screen.getByRole("button", { name: /submit report/i }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
@@ -132,7 +136,7 @@ describe("TicketCard", () => {
       />,
     );
 
-    expect(screen.getByText("ticket_123")).toBeInTheDocument();
+    expect(screen.getByText(/ticket_123/)).toBeInTheDocument();
     expect(screen.getByText("summary text")).toBeInTheDocument();
     expect(screen.getByText("Mexico City")).toBeInTheDocument();
   });

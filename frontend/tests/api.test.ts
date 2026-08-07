@@ -96,7 +96,7 @@ describe("submitProblemReport", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("/v1/problem-reports");
     expect(init.method).toBe("POST");
-    expect(init.headers.Authorization).toBe("Bearer tok123");
+    expect((init.headers as Headers).get("Authorization")).toBe("Bearer tok123");
     expect(JSON.parse(init.body)).toEqual(reportFixture);
   });
 
