@@ -18,10 +18,15 @@ A FastAPI + React (Astro) application for managing Kiwibot problem reports. It i
 
 ```
 app/                        # FastAPI backend
-├── ai/                     # LangGraph/Bedrock code (NOT wired into the running app)
+├── ai/                     # AI providers: BedrockProvider + workflow, and get_report_provider factory
+│   ├── __init__.py         # get_report_provider() + OpenAIProvider adapter (active wiring)
+│   ├── bedrock.py          # AWS Bedrock provider (LangChain)
+│   ├── prompts.py          # LangChain prompt templates
+│   ├── provider.py         # Abstract AIProvider interface
+│   └── workflow.py         # LangGraph workflow (not used by the endpoint)
 ├── config.py               # App configuration (.env via python-dotenv)
 ├── firebase.py             # Firestore client (lazy init)
-├── gpt.py                  # OpenAI provider (singleton, gpt-3.5-turbo) — active AI provider
+├── gpt.py                  # OpenAI client (singleton, gpt-3.5-turbo)
 ├── identify.py             # Firebase email/password login
 ├── main.py                 # FastAPI app and routes (entrypoint)
 ├── middleware.py           # Request ID middleware
@@ -95,12 +100,18 @@ Create a `.env` file based on `.env.example`:
 
 ```env
 OPEN_API_KEY=your_openai_api_key
+AI_PROVIDER=openai            # openai (default) or bedrock
 FIREBASE_API_KEY=your_firebase_api_key
 SERVICE_ACCOUNT_KEY_FILE=path/to/service-account.json
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+# Only needed when AI_PROVIDER=bedrock:
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
 ```
 
-> **Gotcha**: the env var is `OPEN_API_KEY` (NOT `OPENAI_API_KEY`), matching `.env.example` and `app/gpt.py`.
+> **Gotchas**: the env var is `OPEN_API_KEY` (NOT `OPENAI_API_KEY`). The AI provider is selected with `AI_PROVIDER=bedrock|openai` — both expose the same `summarize_report(content)` interface returning `{summary, problem_type}` (see `app/ai/__init__.py`).
 
 Also required at runtime: a Firebase service-account key file and the spaCy model `en_core_web_sm`. Tests mock all external services — no `.env` or network needed to run them.
 
